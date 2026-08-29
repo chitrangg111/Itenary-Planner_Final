@@ -313,6 +313,290 @@ const DESTINATION_INSIGHTS: Record<string, {
       { name: 'Navtara Pure Veg Restaurant', cuisine: 'Pure Veg South & North Indian', specialty: 'Special Ghee Dosa & Veg Thali', price: '₹450 for two', badge: 'Pure Veg 🥦' },
       { name: 'Thalassa Greek Taverna Siolim', cuisine: 'Mediterranean & Sunset Cocktails', specialty: 'Souvlaki & Fresh Baklava', price: '₹2,200 for two', badge: 'Non-Veg 🍗' }
     ]
+  },
+  jaipur: {
+    state: 'Rajasthan',
+    country: 'India',
+    weather: { temp: '27°C', condition: 'Sunny & Warm' },
+    avgHotelPerNight: 3500,
+    popularPlaces: [
+      {
+        title: 'Amer Fort & Sheesh Mahal Exploration',
+        description: 'Majestic 16th-century hilltop fortress featuring mirror-inlaid halls, grand courtyards, and panoramic Maota Lake vistas.',
+        time: '08:30 AM • 3.5 hrs',
+        duration: '3.5 hrs',
+        costBadgeText: 'Entry ₹100',
+        costBadgeClass: 'bg-emerald-100 text-emerald-800',
+        tags: [
+          { icon: 'fort', text: 'Royal Fort', colorClass: 'bg-purple-100 text-purple-800' },
+          { icon: 'camera_alt', text: 'Sheesh Mahal', colorClass: 'bg-indigo-100 text-indigo-800' }
+        ],
+        localTip: 'Arrive early before 9:00 AM to beat tour buses and photograph the mirror palace in natural morning light.',
+        openingHours: '08:00 AM - 05:30 PM',
+        ticketPrice: '₹100 Indian / ₹500 Foreigner',
+        nearbyPlaces: ['Jaigarh Fort & Cannon', 'Panna Meena Ka Kund Stepwell', 'Maota Lake'],
+        recommendedRestaurant: {
+          name: '1135 AD Royal Fine Dining',
+          cuisine: 'Royal Rajputana Mughlai & Thali',
+          estimatedCost: '₹1,200 per person',
+          dietaryType: 'Pure Veg & Non-Veg'
+        },
+        transit: {
+          method: 'Auto or AC Low-Floor Bus from Hawa Mahal to Amer',
+          publicTransports: ['City Bus Route 29', 'E-Rickshaw', 'App Taxi'],
+          fare: '₹20 - ₹200'
+        }
+      },
+      {
+        title: 'Hawa Mahal & Pink City Bazaars (Johari & Bapu Bazaar)',
+        description: 'The iconic 953-window honeycomb pink sandstone facade followed by vibrant textile, mojaris, and lac bangle shopping.',
+        time: '03:30 PM • 3.0 hrs',
+        duration: '3.0 hrs',
+        costBadgeText: 'Entry ₹50',
+        costBadgeClass: 'bg-emerald-100 text-emerald-800',
+        tags: [
+          { icon: 'photo_camera', text: 'Iconic Pink City', colorClass: 'bg-rose-100 text-rose-800' },
+          { icon: 'shopping_bag', text: 'Traditional Bazaars', colorClass: 'bg-amber-100 text-amber-800' }
+        ],
+        localTip: 'Visit Wind View Cafe or Tattoo Cafe across the street for unobstructed rooftop front-facing photos of Hawa Mahal.',
+        openingHours: '09:00 AM - 05:00 PM',
+        ticketPrice: '₹50 Indian / ₹200 Foreigner',
+        nearbyPlaces: ['City Palace Jaipur', 'Jantar Mantar Observatory', 'Sireh Deori Bazaar'],
+        recommendedRestaurant: {
+          name: 'LMB (Laxmi Misthan Bhandar) Johari Bazaar',
+          cuisine: 'Rajasthani Royal Thali, Ghewar & Pyaaz Kachori',
+          estimatedCost: '₹450 per person',
+          dietaryType: 'Pure Veg 🥦'
+        },
+        transit: {
+          method: 'Jaipur Metro to Badi Chaupar Station',
+          publicTransports: ['Jaipur Metro Pink Line', 'E-Rickshaw'],
+          fare: '₹15 - ₹30'
+        }
+      }
+    ],
+    hotels: [
+      { name: 'ITC Rajputana Luxury Collection', rating: '4.8 ★', priceMultiplier: 2.2, vibe: 'Regal Palace Architecture with Royal Courtyard & Pool', amenities: ['Swimming Pool', 'Kaya Kalp Spa', 'Peshawri Dining'] },
+      { name: 'Umaid Bhawan Heritage House', rating: '4.7 ★', priceMultiplier: 1.1, vibe: 'Authentic Painted Fresco Heritage Stay in Bani Park', amenities: ['Rooftop Restaurant', 'Free Wi-Fi', 'Pool'] },
+      { name: 'Zostel Jaipur (M.I. Road)', rating: '4.6 ★', priceMultiplier: 0.5, vibe: 'Vibrant Social Hostel close to Pink City Gates', amenities: ['Common Room', 'Cafe', 'City Walking Tours'] }
+    ],
+    restaurants: [
+      { name: 'Rawat Mishthan Bhandar', cuisine: 'Legendary Rajasthani Snacks', specialty: 'Hot Mawa Kachori & Pyaaz Kachori with Kadhi', price: '₹250 for two', badge: 'Pure Veg 🥦' },
+      { name: 'Handi Restaurant M.I. Road', cuisine: 'Traditional Tandoori & Mughlai', specialty: 'Handi Meat & Rumali Roti', price: '₹950 for two', badge: 'Non-Veg 🍗' },
+      { name: 'Chokhi Dhani Cultural Village', cuisine: 'Unlimited Traditional Rajasthani Thali', specialty: 'Dal Baati Churma, Bajra Khichdi & Sangri', price: '₹1,600 for two', badge: 'Pure Veg 🥦' }
+    ]
+  },
+  manali: {
+    state: 'Himachal Pradesh',
+    country: 'India',
+    weather: { temp: '14°C', condition: 'Cool Alpine Breeze' },
+    avgHotelPerNight: 3200,
+    popularPlaces: [
+      {
+        title: 'Solang Valley & Atal Tunnel High Mountain Adventure',
+        description: 'Paragliding over pine-clad slopes, quad-biking, zorbing, and riding through the 9km Atal Tunnel to Sissu Waterfall.',
+        time: '08:30 AM • 5.0 hrs',
+        duration: '5.0 hrs',
+        costBadgeText: 'Adventure Activities',
+        costBadgeClass: 'bg-blue-100 text-blue-800',
+        tags: [
+          { icon: 'paragliding', text: 'Paragliding', colorClass: 'bg-cyan-100 text-cyan-800' },
+          { icon: 'landscape', text: 'Himalayan Snow Peaks', colorClass: 'bg-indigo-100 text-indigo-800' }
+        ],
+        localTip: 'Carry a heavy fleece jacket; temperatures drop significantly once crossing Atal Tunnel into Lahaul Valley.',
+        openingHours: '08:00 AM - 06:00 PM',
+        ticketPrice: 'Paragliding ₹1,800 - ₹3,200',
+        nearbyPlaces: ['Sissu Waterfall', 'Anjani Mahadev Trek', 'Dhundi Snow Point'],
+        recommendedRestaurant: {
+          name: 'Solang Valley Adventure Cafe',
+          cuisine: 'Hot Thukpa, Steamed Momos & Masala Maggi',
+          estimatedCost: '₹300 per person',
+          dietaryType: 'Veg & Non-Veg'
+        },
+        transit: {
+          method: 'Hired 4x4 Gypsy or Taxi from Mall Road',
+          publicTransports: ['HRTC Electric Bus to Solang', 'Private Taxi Union Cab'],
+          fare: '₹1,500 - ₹2,500 return taxi'
+        }
+      },
+      {
+        title: 'Old Manali Pine Trails & Hadimba Devi Temple',
+        description: 'Ancient 1553 pagoda-style wooden temple nestled amidst towering giant cedar trees followed by vibrant bohemian cafe hopping.',
+        time: '03:30 PM • 3.0 hrs',
+        duration: '3.0 hrs',
+        costBadgeText: 'Free Entry',
+        costBadgeClass: 'bg-emerald-100 text-emerald-800',
+        tags: [
+          { icon: 'temple_hindu', text: 'Historic Pagoda', colorClass: 'bg-amber-100 text-amber-800' },
+          { icon: 'local_cafe', text: 'Boho Cafes', colorClass: 'bg-purple-100 text-purple-800' }
+        ],
+        localTip: 'Walk through the pine forest trail from Hadimba temple down to Manu Temple in Old Manali for serene river views.',
+        openingHours: '08:00 AM - 06:30 PM',
+        ticketPrice: 'Free Temple Entry',
+        nearbyPlaces: ['Manu Temple', 'Van Vihar Riverfront', 'Old Manali Bridge'],
+        recommendedRestaurant: {
+          name: 'Cafe 1947 & Drifters’ Inn Old Manali',
+          cuisine: 'Woodfired Trout, Risotto & Ginger Lemon Honey Tea',
+          estimatedCost: '₹600 per person',
+          dietaryType: 'Continental & Local Trout'
+        },
+        transit: {
+          method: 'Scenic uphill walk or Auto from Mall Road',
+          publicTransports: ['Local Auto Rickshaw', 'Walking Trail'],
+          fare: '₹100 - ₹150 auto'
+        }
+      }
+    ],
+    hotels: [
+      { name: 'The Himalayan Luxury Castle & Resort', rating: '4.8 ★', priceMultiplier: 2.3, vibe: 'Victorian Gothic Stone Castle with Apple Orchards', amenities: ['Swimming Pool', 'Fireplace Suites', 'Fine Dining'] },
+      { name: 'Larisa Resort Manali', rating: '4.7 ★', priceMultiplier: 1.4, vibe: 'Luxury Cottages surrounded by organic orchards and snow peaks', amenities: ['Spa', 'Orchard Walks', 'Free Wi-Fi'] },
+      { name: 'Zostel Old Manali', rating: '4.6 ★', priceMultiplier: 0.5, vibe: 'Charming wooden backpacker chalet overlooking Manalsu River', amenities: ['Rooftop Cafe', 'Board Games', 'Trekking Desk'] }
+    ],
+    restaurants: [
+      { name: 'Johnson’s Bar & Restaurant', cuisine: 'Continental & Woodfired', specialty: 'Fresh Himalayan Pan-Fried Trout & Apple Crumble', price: '₹1,200 for two', badge: 'Non-Veg 🍗' },
+      { name: 'Chopsticks Restaurant Mall Road', cuisine: 'Tibetan & Indo-Chinese', specialty: 'Tibetan Gyathuk, Tingmo & Mutton Momos', price: '₹600 for two', badge: 'Non-Veg 🍗' }
+    ]
+  },
+  udaipur: {
+    state: 'Rajasthan',
+    country: 'India',
+    weather: { temp: '26°C', condition: 'Sunny & Gentle Lake Breeze' },
+    avgHotelPerNight: 3800,
+    popularPlaces: [
+      {
+        title: 'City Palace Udaipur & Lake Pichola Boat Cruise',
+        description: 'Rajasthan’s largest palace complex overlooking Lake Pichola followed by a sunset boat cruise around Jag Mandir Island.',
+        time: '09:00 AM • 4.0 hrs',
+        duration: '4.0 hrs',
+        costBadgeText: 'Entry ₹300',
+        costBadgeClass: 'bg-emerald-100 text-emerald-800',
+        tags: [
+          { icon: 'castle', text: 'Royal Palace', colorClass: 'bg-purple-100 text-purple-800' },
+          { icon: 'directions_boat', text: 'Lake Pichola Cruise', colorClass: 'bg-blue-100 text-blue-800' }
+        ],
+        localTip: 'Book the 05:00 PM sunset boat cruise from Rameshwar Ghat for golden reflections on Taj Lake Palace.',
+        openingHours: '09:00 AM - 05:30 PM',
+        ticketPrice: '₹300 Palace Entry + ₹450 Boat Cruise',
+        nearbyPlaces: ['Jagdish Temple', 'Bagore Ki Haveli', 'Gangaur Ghat'],
+        recommendedRestaurant: {
+          name: 'Ambrai Restaurant at Amet Haveli',
+          cuisine: 'Mewari Royal Cuisine & Multi-Cuisine',
+          estimatedCost: '₹1,100 per person',
+          dietaryType: 'Pure Veg & Non-Veg'
+        },
+        transit: {
+          method: 'Auto / E-Rickshaw through Old City alleys',
+          publicTransports: ['E-Rickshaw', 'Local Auto'],
+          fare: '₹50 - ₹100'
+        }
+      },
+      {
+        title: 'Sajjangarh Monsoon Palace & Dharohar Folk Dance',
+        description: 'Hilltop fortress commanding panoramic 360-degree sunset views followed by puppet and folk dance show at Bagore Ki Haveli.',
+        time: '04:30 PM • 3.5 hrs',
+        duration: '3.5 hrs',
+        costBadgeText: '₹100 Show Pass',
+        costBadgeClass: 'bg-emerald-100 text-emerald-800',
+        tags: [
+          { icon: 'theater_comedy', text: 'Cultural Folk Show', colorClass: 'bg-rose-100 text-rose-800' },
+          { icon: 'landscape', text: 'Sunset Hilltop', colorClass: 'bg-amber-100 text-amber-800' }
+        ],
+        localTip: 'Reach Bagore Ki Haveli by 06:15 PM to grab front-row mattress seating for the 07:00 PM Dharohar show.',
+        openingHours: 'Show timings: 07:00 PM - 08:00 PM',
+        ticketPrice: '₹100 Indian / ₹150 Foreigner',
+        nearbyPlaces: ['Fateh Sagar Lake', 'Saheliyon Ki Bari', 'Moti Magri'],
+        recommendedRestaurant: {
+          name: 'Upre by 1927 Lake Pichola Rooftop',
+          cuisine: 'Rajasthani Laal Maas, Mewari Paneer & Mocktails',
+          estimatedCost: '₹900 per person',
+          dietaryType: 'Pure Veg & Non-Veg'
+        },
+        transit: {
+          method: 'Auto to Gangaur Ghat',
+          publicTransports: ['City Auto', 'Walk'],
+          fare: '₹50'
+        }
+      }
+    ],
+    hotels: [
+      { name: 'Taj Fateh Prakash Palace Lake Pichola', rating: '4.9 ★', priceMultiplier: 2.6, vibe: 'Historic Royal Palace on the banks of Lake Pichola', amenities: ['Infinity Pool', 'Lakefront Dining', 'Heritage Museum'] },
+      { name: 'Amet Haveli Heritage Hotel', rating: '4.7 ★', priceMultiplier: 1.4, vibe: 'Traditional Mewari architecture facing City Palace', amenities: ['Ambrai Restaurant', 'Courtyard', 'Free Wi-Fi'] },
+      { name: 'Moustache Hostel Udaipur', rating: '4.5 ★', priceMultiplier: 0.5, vibe: 'Backpacker haven with direct rooftop view of Gangaur Ghat', amenities: ['Rooftop Cafe', 'Social Events', 'Luggage Storage'] }
+    ],
+    restaurants: [
+      { name: 'Natraj Dining Hall & Restaurant', cuisine: 'Unlimited Authentic Gujarati & Rajasthani Thali', specialty: 'Gujarati Dal, Kadhi, Rotlis, Farsan & Sweets', price: '₹400 for two', badge: 'Pure Veg 🥦' },
+      { name: 'Jheel’s Ginger Coffee Bar & Bakery', cuisine: 'Artisanal Cafe & Bakery', specialty: 'Woodfired Thin Crust Pizza & Cold Brew on Lake Edge', price: '₹600 for two', badge: 'Pure Veg 🥦' }
+    ]
+  },
+  dubai: {
+    state: 'Dubai',
+    country: 'United Arab Emirates',
+    weather: { temp: '31°C', condition: 'Sunny & Desert Warmth' },
+    avgHotelPerNight: 8500,
+    popularPlaces: [
+      {
+        title: 'Burj Khalifa At The Top & Dubai Mall Fountain Show',
+        description: 'World’s tallest 828m skyscraper observation deck on Level 124/125 followed by illuminated choregraphed fountain water show.',
+        time: '03:30 PM • 3.5 hrs',
+        duration: '3.5 hrs',
+        costBadgeText: 'From ₹3,800',
+        costBadgeClass: 'bg-blue-100 text-blue-800',
+        tags: [
+          { icon: 'apartment', text: 'World Tallest Tower', colorClass: 'bg-indigo-100 text-indigo-800' },
+          { icon: 'water', text: 'Fountain Show', colorClass: 'bg-cyan-100 text-cyan-800' }
+        ],
+        localTip: 'Book the 4:30 PM slot to experience daytime, sunset, and night lights from the observation deck on a single ticket.',
+        openingHours: '08:30 AM - 11:00 PM',
+        ticketPrice: 'AED 179 / ~₹4,000',
+        nearbyPlaces: ['Dubai Aquarium & Underwater Zoo', 'Souk Al Bahar', 'Dubai Opera'],
+        recommendedRestaurant: {
+          name: 'Al Hallab Restaurant & Sweets Dubai Mall',
+          cuisine: 'Authentic Lebanese Grills, Hummus & Kunafa',
+          estimatedCost: 'AED 120 / ~₹2,700 per person',
+          dietaryType: 'Halal 🌙'
+        },
+        transit: {
+          method: 'Dubai Metro Red Line to Burj Khalifa / Dubai Mall Station',
+          publicTransports: ['Dubai Metro Red Line', 'Air-Conditioned Metro Link Bridge'],
+          fare: 'AED 5 - 7.5'
+        }
+      },
+      {
+        title: 'Dubai Desert 4x4 Dune Bashing Safari & BBQ Camp',
+        description: 'Thrilling red dunes 4x4 ride, sandboarding, camel riding, henna painting, and Tanoura fire dance dinner under desert stars.',
+        time: '03:00 PM • 6.0 hrs',
+        duration: '6.0 hrs',
+        costBadgeText: 'Safari Package',
+        costBadgeClass: 'bg-emerald-100 text-emerald-800',
+        tags: [
+          { icon: 'sports_motorsports', text: 'Dune Bashing', colorClass: 'bg-amber-100 text-amber-800' },
+          { icon: 'nights_stay', text: 'Desert Camp', colorClass: 'bg-purple-100 text-purple-800' }
+        ],
+        localTip: 'Avoid heavy meals right before dune bashing; wear slip-on sandals for easy walking on red desert sand.',
+        openingHours: '03:00 PM - 09:30 PM',
+        ticketPrice: 'AED 150 - 250 / ~₹3,400 - ₹5,600 with hotel pickup',
+        nearbyPlaces: ['Lahbab Red Dunes', 'Camel Breeding Farm', 'Desert Star Camp'],
+        recommendedRestaurant: {
+          name: 'Al Hadheerah Desert Fine Dining',
+          cuisine: 'Live Charcoal Shawarma, Lamb Ouzi & Arabic Sweets',
+          estimatedCost: 'Included in safari package',
+          dietaryType: 'Halal 🌙 & Veg Options'
+        },
+        transit: {
+          method: 'Hotel Pickup in 4x4 Land Cruiser',
+          publicTransports: ['Tour 4x4 Vehicle'],
+          fare: 'Included in Safari'
+        }
+      }
+    ],
+    hotels: [
+      { name: 'Atlantis The Palm Luxury Resort', rating: '4.9 ★', priceMultiplier: 2.8, vibe: 'Iconic Palm Jumeirah resort with Aquaventure waterpark access', amenities: ['Private Beach', 'Aquarium', '17 Restaurants'] },
+      { name: 'Rove Downtown Dubai', rating: '4.7 ★', priceMultiplier: 1.1, vibe: 'Trendy modern hotel facing Burj Khalifa & Dubai Mall', amenities: ['Swimming Pool', '24/7 Laundromat', 'Free High-speed Wi-Fi'] }
+    ],
+    restaurants: [
+      { name: 'Al Ustad Special Kabab Bur Dubai', cuisine: 'Legendary Iranian Grills since 1978', specialty: 'Kabab Khas with Saffron Rice & Mint Yogurt', price: 'AED 80 for two (~₹1,800)', badge: 'Halal 🌙' },
+      { name: 'Saravanaa Bhavan Karama', cuisine: 'Pure Veg South Indian', specialty: 'Ghee Roast Masala Dosa & Filter Coffee', price: 'AED 50 for two (~₹1,100)', badge: 'Pure Veg 🥦' }
+    ]
   }
 };
 
@@ -579,7 +863,13 @@ export function synthesizeTripItinerary(input: GenerationInput): TripItinerary {
 
   // Construct restaurants
   const restaurants: RestaurantRecommendation[] = insight
-    ? insight.restaurants
+    ? insight.restaurants.map((r) => ({
+        name: r.name,
+        cuisine: r.cuisine,
+        specialty: r.specialty,
+        priceRange: r.price,
+        dietaryBadge: r.badge
+      }))
     : [
         {
           name: `${cityTitle} Heritage Dining Room`,

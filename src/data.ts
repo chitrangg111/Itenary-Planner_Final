@@ -995,22 +995,7 @@ export function getPrebuiltOrFallbackItinerary(
   datesStr?: string,
   daysCount: number = 3
 ): TripItinerary {
-  const norm = destination.toLowerCase().trim();
-
-  if (norm.includes('mumbai') || norm.includes('gateway') || norm.includes('marine drive') || norm.includes('colaba')) {
-    return MUMBAI_ITINERARY;
-  }
-  if (norm.includes('zermatt') || norm.includes('switzerland')) {
-    return ZERMATT_ITINERARY;
-  }
-  if (norm.includes('male') || norm.includes('maldives')) {
-    return MALDIVES_ITINERARY;
-  }
-  if (norm.includes('kyoto') || norm.includes('japan')) {
-    return KYOTO_ITINERARY;
-  }
-
-  // Dynamic intelligent synthesis for any city (Goa, Paris, Delhi, Dubai, London, Sikar, Churu, Manali, etc.)
+  // Dynamic intelligent synthesis for any city (Goa, Paris, Delhi, Dubai, London, Sikar, Churu, Manali, Jaipur, etc.)
   return synthesizeTripItinerary({
     destination,
     departure: datesStr?.split('•')[0]?.trim(),
