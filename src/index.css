@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@layer base {
+  html, body {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+    user-select: none;
+  }
+}
+
+/* Custom mobile scrollbar */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 9999px;
+}
+

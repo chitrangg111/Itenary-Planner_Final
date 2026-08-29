@@ -1,0 +1,6 @@
+{
+  "name": "AI Travel Planner",
+  "description": "AI Travel Planner and Concierge with personalized trip generation, day-by-day itineraries, budget engine, and real-time Lumi AI assistant.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
