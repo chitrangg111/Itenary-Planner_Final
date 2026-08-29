@@ -37,6 +37,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   const [showAdvancedNetwork, setShowAdvancedNetwork] = useState(false);
   const [saveSuccessMsg, setSaveSuccessMsg] = useState('');
 
+  const [showKeyPassword, setShowKeyPassword] = useState(false);
+
   useEffect(() => {
     setBackendUrlState(getBackendBaseUrl() || DEFAULT_LIVE_BACKEND_URL);
     setGeminiKeyState(getDirectGeminiApiKey());
@@ -65,9 +67,15 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   const handleSaveNetworkSettings = () => {
     setBackendBaseUrl(backendUrl === DEFAULT_LIVE_BACKEND_URL ? '' : backendUrl);
     setDirectGeminiApiKey(geminiKey);
-    setSaveSuccessMsg('Settings saved successfully!');
+    setSaveSuccessMsg('Settings saved and applied!');
     setTimeout(() => setSaveSuccessMsg(''), 3000);
     handleTestPing();
+  };
+
+  const handleGeminiKeyChange = (val: string) => {
+    setGeminiKeyState(val);
+    // Auto sync immediately to storage so trip generator picks it up right away
+    setDirectGeminiApiKey(val);
   };
 
   const handleResetDefaultUrl = () => {
@@ -249,8 +257,13 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             {/* Direct Gemini API Key */}
             <div className="space-y-1">
               <div className="flex justify-between items-center">
-                <label className="text-xs font-bold text-[#1a1b1f]">
-                  Direct Google Gemini API Key <span className="text-gray-400 font-normal">(Optional)</span>
+                <label className="text-xs font-bold text-[#1a1b1f] flex items-center gap-1.5">
+                  <span>Direct Google Gemini API Key</span>
+                  {geminiKey && (
+                    <span className="bg-blue-100 text-blue-800 text-[10px] px-1.5 py-0.2 rounded font-semibold">
+                      Key Configured
+                    </span>
+                  )}
                 </label>
                 <a
                   href="https://aistudio.google.com/app/apikey"
@@ -262,15 +275,39 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                   <span className="material-symbols-outlined text-[12px]">open_in_new</span>
                 </a>
               </div>
-              <input
-                type="password"
-                value={geminiKey}
-                onChange={(e) => setGeminiKeyState(e.target.value)}
-                placeholder="AIzaSy... (Direct mobile-to-Gemini internet mode)"
-                className="w-full h-[42px] px-3 rounded-xl border border-[#c1c6d7] bg-white text-xs font-medium text-[#1a1b1f] outline-none focus:ring-2 focus:ring-[#0058bc]"
-              />
+              <div className="relative">
+                <input
+                  type={showKeyPassword ? 'text' : 'password'}
+                  value={geminiKey}
+                  onChange={(e) => handleGeminiKeyChange(e.target.value)}
+                  placeholder="AIzaSy... (Direct mobile-to-Gemini internet mode)"
+                  className="w-full h-[42px] pl-3 pr-16 rounded-xl border border-[#c1c6d7] bg-white text-xs font-medium text-[#1a1b1f] outline-none focus:ring-2 focus:ring-[#0058bc]"
+                />
+                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setShowKeyPassword(!showKeyPassword)}
+                    className="p-1.5 text-gray-400 hover:text-gray-700 cursor-pointer"
+                    title={showKeyPassword ? 'Hide Key' : 'Show Key'}
+                  >
+                    <span className="material-symbols-outlined text-base">
+                      {showKeyPassword ? 'visibility_off' : 'visibility'}
+                    </span>
+                  </button>
+                  {geminiKey && (
+                    <button
+                      type="button"
+                      onClick={() => handleGeminiKeyChange('')}
+                      className="p-1.5 text-gray-400 hover:text-red-600 cursor-pointer"
+                      title="Clear Key"
+                    >
+                      <span className="material-symbols-outlined text-base">close</span>
+                    </button>
+                  )}
+                </div>
+              </div>
               <p className="text-[10px] text-[#717786]">
-                Provide your personal Gemini API key to make direct API calls directly from your phone to Google servers without routing through the backend.
+                When your Gemini key is saved, trip generation and Lumi chat query Google Gemini directly over mobile internet without needing any intermediate proxy.
               </p>
             </div>
 
