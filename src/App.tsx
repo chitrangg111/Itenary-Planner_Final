@@ -24,6 +24,7 @@ import {
 } from './data';
 import { synthesizeTripItinerary } from './utils/tripSynthesizer';
 import { generateLumiAssistantReply } from './utils/chatAssistant';
+import { apiGenerateTrip, apiSendChat } from './utils/apiClient';
 import {
   RecentTrip,
   DreamDestination,
@@ -226,16 +227,10 @@ export default function App() {
     setIsChatLoading(true);
 
     try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text }),
-      });
-
-      const data = await res.json();
+      const data = await apiSendChat(text, currentTrip.destination);
       setIsChatLoading(false);
 
-      if (data.reply) {
+      if (data && data.reply) {
         const lumiMsg: ChatMessage = {
           id: `l-${Date.now()}`,
           sender: 'lumi',
@@ -249,6 +244,16 @@ export default function App() {
           } : undefined),
         };
         setChatMessages((prev) => [...prev, lumiMsg]);
+      } else {
+        const fallbackResponse = generateLumiAssistantReply(text, currentTrip.destination);
+        const fallbackMsg: ChatMessage = {
+          id: `l-${Date.now()}`,
+          sender: 'lumi',
+          text: fallbackResponse.reply,
+          isUpdatedBadge: text.toLowerCase().includes('hike') || text.toLowerCase().includes('replace'),
+          previewCard: fallbackResponse.previewCard,
+        };
+        setChatMessages((prev) => [...prev, fallbackMsg]);
       }
     } catch (err) {
       console.log('Mobile chat fallback:', err);
@@ -315,14 +320,9 @@ export default function App() {
 
     let generatedItinerary: TripItinerary;
     try {
-      const res = await fetch('/api/generate-trip', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      const json = await res.json();
-      if (json && json.dayItineraries && Array.isArray(json.dayItineraries) && json.dayItineraries.length > 0) {
-        generatedItinerary = json as TripItinerary;
+      const apiResult = await apiGenerateTrip(data);
+      if (apiResult && apiResult.dayItineraries && Array.isArray(apiResult.dayItineraries) && apiResult.dayItineraries.length > 0) {
+        generatedItinerary = apiResult;
       } else {
         generatedItinerary = synthesizeTripItinerary({
           destination: data.destination || 'Custom Destination',
@@ -336,7 +336,7 @@ export default function App() {
         });
       }
     } catch (err) {
-      console.log('Mobile client trip synthesis:', err);
+      console.log('Mobile client trip synthesis fallback:', err);
       generatedItinerary = synthesizeTripItinerary({
         destination: data.destination || 'Custom Destination',
         from: data.from,

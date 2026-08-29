@@ -736,6 +736,7 @@ export function synthesizeTripItinerary(input: GenerationInput): TripItinerary {
         tags: [
           { icon: 'restaurant_menu', text: 'Foodie Trail', colorClass: 'bg-amber-100 text-amber-800' }
         ],
+        localTip: `"Taste the signature street delicacies and sweet items at stalls with high local customer footfall for the freshest quality."`,
         openingHours: '11:00 AM - 10:30 PM',
         ticketPrice: '₹300 - ₹600 per meal',
         nearbyPlaces: [`${cityTitle} Spice Lane`, 'Crafts Quarter', 'Artisanal Alley'],
@@ -881,6 +882,18 @@ export function synthesizeTripItinerary(input: GenerationInput): TripItinerary {
       'Central Bazaar & Handicraft Street',
       'Artisan Food Alley'
     ],
+    localTips: [
+      `Timing: Start morning sightseeing between 07:30 AM – 09:00 AM to beat crowds and capture soft lighting.`,
+      `Transit Savings: Use local day transit passes, metros, or shared autos to save up to 40% on daily travel.`,
+      `Dining: Look for authentic eateries with high local footfall for the freshest regional specialties.`,
+      `Payments & Booking: Keep small cash handy for local stalls, while UPI / cards work at major shops and heritage entries.`
+    ],
+    travelAdvice: {
+      bestTime: 'October to March (Pleasant weather & clear skies)',
+      clothing: 'Light breathable cottons for daytime, light jacket for breezy evenings.',
+      moneySaving: 'Book entry tickets online where available and negotiate auto fares or use ride-hailing apps.',
+      safetyOrEtiquette: 'Carry a refillable water bottle and respect dress codes at cultural shrines.'
+    },
     dayItineraries
   };
 }

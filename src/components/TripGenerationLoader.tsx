@@ -101,9 +101,15 @@ export const TripGenerationLoader: React.FC<TripGenerationLoaderProps> = ({
               <span className="material-symbols-outlined text-amber-300 animate-pulse text-2xl">
                 auto_awesome
               </span>
-              <span className="text-xs font-extrabold uppercase tracking-widest text-blue-100">
-                AI Travel Concierge
-              </span>
+              <div>
+                <span className="text-xs font-extrabold uppercase tracking-widest text-blue-100 block leading-tight">
+                  AI Travel Concierge
+                </span>
+                <span className="text-[10px] text-emerald-300 font-semibold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block"></span>
+                  Live Cloud AI Generation
+                </span>
+              </div>
             </div>
             <span className="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-white border border-white/20">
               {days} Days • ₹{budgetINR}

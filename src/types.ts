@@ -105,6 +105,13 @@ export interface TripItinerary {
   hotels?: HotelRecommendation[];
   restaurants?: RestaurantRecommendation[];
   nearbyAttractions?: string[];
+  localTips?: string[];
+  travelAdvice?: {
+    bestTime?: string;
+    clothing?: string;
+    moneySaving?: string;
+    safetyOrEtiquette?: string;
+  };
   dayItineraries: DayItinerary[];
 }
 

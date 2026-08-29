@@ -1,6 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { USER_AVATAR } from '../data';
 import { UserPreferences } from '../types';
+import {
+  getBackendBaseUrl,
+  setBackendBaseUrl,
+  getDirectGeminiApiKey,
+  setDirectGeminiApiKey,
+  testConnection,
+  HealthCheckResult,
+  DEFAULT_LIVE_BACKEND_URL,
+  isMobileApp,
+} from '../utils/apiClient';
 
 interface ProfileViewProps {
   preferences: UserPreferences;
@@ -18,6 +28,54 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   const [isEditingName, setIsEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(preferences.userName || 'Alex');
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  // Network & Connectivity State
+  const [backendUrl, setBackendUrlState] = useState('');
+  const [geminiKey, setGeminiKeyState] = useState('');
+  const [isTestingConnection, setIsTestingConnection] = useState(false);
+  const [testResult, setTestResult] = useState<HealthCheckResult | null>(null);
+  const [showAdvancedNetwork, setShowAdvancedNetwork] = useState(false);
+  const [saveSuccessMsg, setSaveSuccessMsg] = useState('');
+
+  useEffect(() => {
+    setBackendUrlState(getBackendBaseUrl() || DEFAULT_LIVE_BACKEND_URL);
+    setGeminiKeyState(getDirectGeminiApiKey());
+    // Run quick connection check on load
+    testConnection().then(setTestResult).catch(() => {});
+  }, []);
+
+  const handleTestPing = async () => {
+    setIsTestingConnection(true);
+    setTestResult(null);
+    try {
+      const res = await testConnection();
+      setTestResult(res);
+    } catch (e: any) {
+      setTestResult({
+        ok: false,
+        url: backendUrl,
+        latencyMs: 0,
+        message: e?.message || 'Connection test failed',
+      });
+    } finally {
+      setIsTestingConnection(false);
+    }
+  };
+
+  const handleSaveNetworkSettings = () => {
+    setBackendBaseUrl(backendUrl === DEFAULT_LIVE_BACKEND_URL ? '' : backendUrl);
+    setDirectGeminiApiKey(geminiKey);
+    setSaveSuccessMsg('Settings saved successfully!');
+    setTimeout(() => setSaveSuccessMsg(''), 3000);
+    handleTestPing();
+  };
+
+  const handleResetDefaultUrl = () => {
+    setBackendUrlState(DEFAULT_LIVE_BACKEND_URL);
+    setBackendBaseUrl(null);
+    setSaveSuccessMsg('Reset to default Cloud AI endpoint!');
+    setTimeout(() => setSaveSuccessMsg(''), 3000);
+  };
 
   const handleSaveName = () => {
     if (nameInput.trim() && onUpdatePreferences) {
@@ -84,6 +142,153 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             <span className="text-xs font-semibold text-[#414755]">Trips Planned</span>
           </div>
         </div>
+      </div>
+
+      {/* Cloud AI & Internet Connectivity (Crucial for APK & Mobile Data) */}
+      <div className="bg-white rounded-[24px] p-6 border border-blue-100 shadow-[0px_4px_20px_rgba(0,0,0,0.05)] space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-[#0058bc]">
+              <span className="material-symbols-outlined text-xl">wifi</span>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-[#1a1b1f]">Internet & Live AI Generation</h3>
+              <p className="text-xs text-[#717786]">
+                {isMobileApp() ? 'Android APK Mobile Mode' : 'Web & Cloud Runtime'}
+              </p>
+            </div>
+          </div>
+          <span
+            className={`px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 ${
+              testResult?.ok
+                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                : 'bg-amber-50 text-amber-700 border border-amber-200'
+            }`}
+          >
+            <span
+              className={`w-2 h-2 rounded-full ${
+                testResult?.ok ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'
+              }`}
+            />
+            {testResult?.ok ? 'Online AI Active' : 'Checking / Standby'}
+          </span>
+        </div>
+
+        {/* Live Test Status Banner */}
+        <div className="bg-[#f8fafd] p-3.5 rounded-2xl border border-blue-100/80 space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-[#414755]">Live AI Connection:</span>
+            <button
+              onClick={handleTestPing}
+              disabled={isTestingConnection}
+              className="text-[#0058bc] font-bold hover:underline flex items-center gap-1 cursor-pointer disabled:opacity-60"
+            >
+              <span
+                className={`material-symbols-outlined text-sm ${
+                  isTestingConnection ? 'animate-spin' : ''
+                }`}
+              >
+                sync
+              </span>
+              <span>{isTestingConnection ? 'Testing...' : 'Test Connection'}</span>
+            </button>
+          </div>
+
+          {testResult && (
+            <p
+              className={`text-xs font-medium ${
+                testResult.ok ? 'text-emerald-700' : 'text-amber-800'
+              }`}
+            >
+              {testResult.message}
+            </p>
+          )}
+
+          <p className="text-[11px] text-[#717786] leading-relaxed">
+            When connected to the internet, the app automatically calls the live Cloud Gemini AI to generate custom itineraries for any city worldwide. If offline or in low connectivity, intelligent client-side synthesis is used.
+          </p>
+        </div>
+
+        {/* Toggle Advanced Connection Settings */}
+        <div>
+          <button
+            type="button"
+            onClick={() => setShowAdvancedNetwork(!showAdvancedNetwork)}
+            className="text-xs text-[#0058bc] font-bold flex items-center gap-1 hover:underline cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-sm">
+              {showAdvancedNetwork ? 'expand_less' : 'tune'}
+            </span>
+            <span>{showAdvancedNetwork ? 'Hide Advanced Server Settings' : 'Configure Custom Server or Gemini API Key'}</span>
+          </button>
+        </div>
+
+        {showAdvancedNetwork && (
+          <div className="p-4 bg-[#f4f3f8] rounded-2xl border border-black/5 space-y-3.5 animate-in fade-in duration-200">
+            {/* Backend URL */}
+            <div className="space-y-1">
+              <div className="flex justify-between items-center">
+                <label className="text-xs font-bold text-[#1a1b1f]">Cloud Backend API URL</label>
+                <button
+                  type="button"
+                  onClick={handleResetDefaultUrl}
+                  className="text-[11px] text-[#0058bc] font-semibold hover:underline"
+                >
+                  Restore Default
+                </button>
+              </div>
+              <input
+                type="text"
+                value={backendUrl}
+                onChange={(e) => setBackendUrlState(e.target.value)}
+                placeholder={DEFAULT_LIVE_BACKEND_URL}
+                className="w-full h-[42px] px-3 rounded-xl border border-[#c1c6d7] bg-white text-xs font-medium text-[#1a1b1f] outline-none focus:ring-2 focus:ring-[#0058bc]"
+              />
+            </div>
+
+            {/* Direct Gemini API Key */}
+            <div className="space-y-1">
+              <div className="flex justify-between items-center">
+                <label className="text-xs font-bold text-[#1a1b1f]">
+                  Direct Google Gemini API Key <span className="text-gray-400 font-normal">(Optional)</span>
+                </label>
+                <a
+                  href="https://aistudio.google.com/app/apikey"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[11px] text-[#0058bc] font-semibold hover:underline flex items-center gap-0.5"
+                >
+                  <span>Get Free Key</span>
+                  <span className="material-symbols-outlined text-[12px]">open_in_new</span>
+                </a>
+              </div>
+              <input
+                type="password"
+                value={geminiKey}
+                onChange={(e) => setGeminiKeyState(e.target.value)}
+                placeholder="AIzaSy... (Direct mobile-to-Gemini internet mode)"
+                className="w-full h-[42px] px-3 rounded-xl border border-[#c1c6d7] bg-white text-xs font-medium text-[#1a1b1f] outline-none focus:ring-2 focus:ring-[#0058bc]"
+              />
+              <p className="text-[10px] text-[#717786]">
+                Provide your personal Gemini API key to make direct API calls directly from your phone to Google servers without routing through the backend.
+              </p>
+            </div>
+
+            {saveSuccessMsg && (
+              <div className="p-2 bg-emerald-50 border border-emerald-200 rounded-lg text-xs font-bold text-emerald-700 text-center">
+                {saveSuccessMsg}
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={handleSaveNetworkSettings}
+              className="w-full h-[42px] bg-[#0058bc] hover:bg-[#004494] text-white font-bold text-xs rounded-xl transition-colors cursor-pointer"
+            >
+              Save & Apply Settings
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Preferences Summary */}
@@ -219,3 +424,4 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     </div>
   );
 };
+

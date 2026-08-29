@@ -165,6 +165,18 @@ export const GOA_ITINERARY: TripItinerary = {
     },
   ],
   nearbyAttractions: ['Baga Beach Market', 'Fort Aguada Lighthouse', 'Chapora Fort (Dil Chahta Hai point)', 'Dudhsagar Waterfalls'],
+  localTips: [
+    'Rent a scooter (₹350-₹450/day) near Calangute or Candolim for maximum flexibility and cost savings across beaches.',
+    'Visit Chapora and Aguada forts in late afternoon (around 4:30 PM) for cooler weather and gorgeous sunset backdrops.',
+    'Carry waterproof pouches for phones and cash during watersports at Baga and Calangute beaches.',
+    'For authentic Goan food, try beach shacks slightly off the main strip for better pricing and freshly cooked meals.'
+  ],
+  travelAdvice: {
+    bestTime: 'October to March (Pleasant sunshine and lively beach atmosphere)',
+    clothing: 'Breathable beachwear, cotton t-shirts, sunglasses, and comfortable flip-flops or sandals.',
+    moneySaving: 'Opt for bike/scooter rentals over private cabs to save up to ₹2,000 per day on transit.',
+    safetyOrEtiquette: 'Always swim within red-and-yellow flagged zones monitored by Drishti lifeguards.'
+  },
   dayItineraries: [
     {
       dayNumber: 1,

@@ -404,6 +404,60 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
         </section>
       )}
 
+      {/* Destination Insider Travel Tips & Advice (Works 100% Offline & on APK) */}
+      <section className="bg-gradient-to-br from-[#003875]/10 via-[#0058bc]/5 to-indigo-50/50 rounded-2xl p-4 border border-blue-200/80 shadow-sm space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-[#0058bc] text-xl">lightbulb</span>
+            <h3 className="font-bold text-sm text-[#002855]">Insider Travel Tips & Guide for {destinationName}</h3>
+          </div>
+          <span className="bg-blue-100 text-[#0058bc] px-2 py-0.5 rounded-full text-[10px] font-bold">
+            Local Secrets
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+          {(currentTrip?.localTips && currentTrip.localTips.length > 0
+            ? currentTrip.localTips
+            : [
+                `Timing: Start morning sightseeing between 07:30 AM – 09:00 AM to beat crowds and capture soft lighting.`,
+                `Transit Savings: Use local day transit passes, metros, or shared autos to save up to 40% on daily travel.`,
+                `Dining: Look for authentic eateries with high local footfall for the freshest regional specialties.`,
+                `Payments: Keep small cash handy for local stalls, while UPI / cards work at major shops and heritage entries.`
+              ]
+          ).map((tip, tIdx) => (
+            <div
+              key={tIdx}
+              className="bg-white/90 backdrop-blur-xs p-3 rounded-xl border border-blue-100 flex items-start gap-2.5 shadow-2xs"
+            >
+              <span className="material-symbols-outlined text-[#0058bc] text-base shrink-0 mt-0.5">
+                tips_and_updates
+              </span>
+              <p className="text-xs text-[#1a1b1f] font-medium leading-relaxed">
+                {tip}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {currentTrip?.travelAdvice && (
+          <div className="pt-2 border-t border-blue-200/60 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            {currentTrip.travelAdvice.bestTime && (
+              <div className="flex items-center gap-2 text-[#414755]">
+                <span className="material-symbols-outlined text-amber-600 text-sm">calendar_month</span>
+                <span><strong>Best Season:</strong> {currentTrip.travelAdvice.bestTime}</span>
+              </div>
+            )}
+            {currentTrip.travelAdvice.moneySaving && (
+              <div className="flex items-center gap-2 text-[#414755]">
+                <span className="material-symbols-outlined text-emerald-600 text-sm">savings</span>
+                <span><strong>Save Money:</strong> {currentTrip.travelAdvice.moneySaving}</span>
+              </div>
+            )}
+          </div>
+        )}
+      </section>
+
       {/* Ask Lumi AI Question Bar */}
       <section className="bg-gradient-to-r from-purple-900 via-indigo-900 to-[#0058bc] rounded-[24px] p-5 text-white shadow-md space-y-3">
         <div className="flex items-center gap-2">
