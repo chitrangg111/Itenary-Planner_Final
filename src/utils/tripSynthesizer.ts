@@ -1,5 +1,6 @@
 import { TripItinerary, DayItinerary, ItineraryActivity, HotelRecommendation, RestaurantRecommendation } from '../types';
 import { getAccuratePhotoUrl } from './photoResolver';
+import { WORLD_DESTINATIONS } from './worldDestinations';
 
 interface GenerationInput {
   from?: string;
@@ -13,39 +14,8 @@ interface GenerationInput {
 }
 
 // Comprehensive destination knowledge base with authentic landmarks, authentic food spots, and local transit
-const DESTINATION_INSIGHTS: Record<string, {
-  state: string;
-  country: string;
-  weather: { temp: string; condition: string };
-  avgHotelPerNight: number;
-  popularPlaces: {
-    title: string;
-    description: string;
-    time: string;
-    duration: string;
-    costBadgeText: string;
-    costBadgeClass: string;
-    tags: { icon: string; text: string; colorClass: string }[];
-    localTip: string;
-    openingHours: string;
-    ticketPrice: string;
-    dietaryType?: 'Pure Veg' | 'Jain Friendly' | 'Non-Veg';
-    nearbyPlaces: string[];
-    recommendedRestaurant: {
-      name: string;
-      cuisine: string;
-      estimatedCost: string;
-      dietaryType: string;
-    };
-    transit: {
-      method: string;
-      publicTransports: string[];
-      fare: string;
-    };
-  }[];
-  hotels: { name: string; rating: string; priceMultiplier: number; vibe: string; amenities: string[] }[];
-  restaurants: { name: string; cuisine: string; specialty: string; price: string; badge: 'Pure Veg 🥦' | 'Jain Available 🪷' | 'Non-Veg 🍗' | 'Halal 🌙' }[];
-}> = {
+const DESTINATION_INSIGHTS: Record<string, any> = {
+  ...WORLD_DESTINATIONS,
   sikar: {
     state: 'Rajasthan',
     country: 'India',

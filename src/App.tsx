@@ -23,6 +23,7 @@ import {
   getPrebuiltOrFallbackItinerary,
 } from './data';
 import { synthesizeTripItinerary } from './utils/tripSynthesizer';
+import { generateLumiAssistantReply } from './utils/chatAssistant';
 import {
   RecentTrip,
   DreamDestination,
@@ -250,12 +251,15 @@ export default function App() {
         setChatMessages((prev) => [...prev, lumiMsg]);
       }
     } catch (err) {
-      console.error(err);
+      console.log('Mobile chat fallback:', err);
       setIsChatLoading(false);
+      const fallbackResponse = generateLumiAssistantReply(text, currentTrip.destination);
       const fallbackMsg: ChatMessage = {
         id: `l-${Date.now()}`,
         sender: 'lumi',
-        text: `I've updated your preferences for "${text}". I can customize your day-by-day Kyoto and Switzerland itineraries to fit your budget!`,
+        text: fallbackResponse.reply,
+        isUpdatedBadge: text.toLowerCase().includes('hike') || text.toLowerCase().includes('replace'),
+        previewCard: fallbackResponse.previewCard,
       };
       setChatMessages((prev) => [...prev, fallbackMsg]);
     }
