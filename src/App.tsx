@@ -12,6 +12,9 @@ import { ProfileView } from './components/ProfileView';
 import { AddActivityModal } from './components/AddActivityModal';
 import { AddExpenseModal } from './components/AddExpenseModal';
 import { TripGenerationLoader } from './components/TripGenerationLoader';
+import { ShareExportModal } from './components/ShareExportModal';
+import { PrintableItinerary } from './components/PrintableItinerary';
+import { checkUrlForSharedTrip } from './utils/shareUtils';
 
 import {
   INITIAL_RECENT_TRIPS,
@@ -140,6 +143,43 @@ export default function App() {
   // Modal states
   const [isAddActivityOpen, setIsAddActivityOpen] = useState(false);
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [sharedTripNotification, setSharedTripNotification] = useState<string | null>(null);
+
+  // Check URL on startup for shared trip parameter
+  useEffect(() => {
+    const sharedTrip = checkUrlForSharedTrip();
+    if (sharedTrip) {
+      setCurrentTrip(sharedTrip);
+      if (sharedTrip.dayItineraries && sharedTrip.dayItineraries.length > 0) {
+        setDayItineraries(sharedTrip.dayItineraries);
+      }
+      setTripItinerariesMap((prev) => ({ ...prev, [sharedTrip.id]: sharedTrip }));
+      setRecentTrips((prev) => [
+        {
+          id: sharedTrip.id,
+          destination: sharedTrip.destination,
+          dates: sharedTrip.dates,
+          travellers: sharedTrip.travellers || '2 Travellers',
+          status: 'Ongoing',
+          imageUrl: sharedTrip.imageUrl || 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80',
+        },
+        ...prev.filter((t) => t.id !== sharedTrip.id),
+      ]);
+      setActiveTab('itinerary');
+      setSharedTripNotification(`Shared trip loaded: ${sharedTrip.destination}! Saved to your itineraries.`);
+      
+      // Clean up URL hash to keep browser address bar clean
+      if (typeof window !== 'undefined' && window.history && window.history.replaceState) {
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+
+      const timer = setTimeout(() => {
+        setSharedTripNotification(null);
+      }, 7000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   // Bookmark toggle
   const handleToggleBookmark = (id: string) => {
@@ -438,9 +478,27 @@ export default function App() {
           onOpenProfile={() => setActiveTab('profile')}
           showSearch={activeTab === 'itinerary' || activeTab === 'explore'}
           onSearchClick={() => setActiveTab('explore')}
+          showShare={activeTab === 'itinerary'}
+          onShareClick={() => setIsShareModalOpen(true)}
           isPhoneFrame={isPhoneFrame}
           onToggleFrame={() => setIsPhoneFrame(!isPhoneFrame)}
         />
+
+        {/* Shared Trip Import Notification Banner */}
+        {sharedTripNotification && (
+          <div className="bg-gradient-to-r from-emerald-600 to-teal-700 text-white px-4 py-2.5 text-xs font-bold flex items-center justify-between shadow-md animate-fadeIn no-print z-30">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-sm">cloud_download</span>
+              <span>{sharedTripNotification}</span>
+            </div>
+            <button
+              onClick={() => setSharedTripNotification(null)}
+              className="p-1 hover:bg-white/20 rounded cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-sm">close</span>
+            </button>
+          </div>
+        )}
 
         {/* Scrollable Main Content Area */}
         <main className="flex-1 min-h-0 overflow-y-auto px-4 py-3 space-y-4 scrollbar-thin">
@@ -465,6 +523,7 @@ export default function App() {
               onAddActivityClick={() => setIsAddActivityOpen(true)}
               onAskLumi={handleAskLumi}
               onUpdateTimings={handleUpdateTimings}
+              onShareClick={() => setIsShareModalOpen(true)}
             />
           )}
 
@@ -472,6 +531,7 @@ export default function App() {
             <BudgetView
               expenses={expenses}
               onAddExpenseClick={() => setIsAddExpenseOpen(true)}
+              currentTrip={currentTrip}
             />
           )}
 
@@ -536,7 +596,17 @@ export default function App() {
             progressPercent={generationProgress}
           />
         )}
+
+        {/* Share & Export Modal */}
+        <ShareExportModal
+          isOpen={isShareModalOpen}
+          onClose={() => setIsShareModalOpen(false)}
+          trip={currentTrip}
+        />
       </div>
+
+      {/* Print-Only Clean PDF Output (rendered on window.print()) */}
+      <PrintableItinerary trip={currentTrip} />
     </div>
   );
 }

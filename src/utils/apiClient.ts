@@ -19,10 +19,9 @@ const STORAGE_KEYS = {
 
 // Supported Gemini models ordered by performance & capability
 const GEMINI_MODELS = [
+  'gemini-3.6-flash',
+  'gemini-3.8-flash',
   'gemini-2.5-flash',
-  'gemini-2.0-flash',
-  'gemini-1.5-flash',
-  'gemini-2.5-pro',
 ];
 
 /**
@@ -30,12 +29,13 @@ const GEMINI_MODELS = [
  */
 export function isMobileApp(): boolean {
   if (typeof window === 'undefined') return false;
-  const isCapacitor =
-    window.location.protocol === 'capacitor:' ||
-    (window as any).Capacitor !== undefined ||
-    (window.location.hostname === 'localhost' && !window.location.port) ||
-    window.location.origin.includes('localhost');
-  return Boolean(isCapacitor);
+  if (
+    typeof (window as any).Capacitor !== 'undefined' &&
+    typeof (window as any).Capacitor.isNativePlatform === 'function'
+  ) {
+    return (window as any).Capacitor.isNativePlatform();
+  }
+  return window.location.protocol === 'capacitor:';
 }
 
 /**
@@ -49,12 +49,12 @@ export function getBackendBaseUrl(): string {
     return customUrl.trim().replace(/\/+$/, '');
   }
 
-  // If inside Android APK (Capacitor) or localhost with no Express dev server
+  // If inside Android APK native container
   if (isMobileApp()) {
     return DEFAULT_LIVE_BACKEND_URL;
   }
 
-  // Running on web server (Cloud Run or dev server)
+  // Running on web server (relative path on same origin)
   return '';
 }
 
@@ -228,7 +228,7 @@ export async function apiGenerateTrip(params: {
   const endpoint = `${baseUrl}/api/generate-trip`;
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 40000);
+  const timeoutId = setTimeout(() => controller.abort(), 16000);
 
   try {
     console.log(`[API Client] Requesting trip from backend: ${endpoint}`);

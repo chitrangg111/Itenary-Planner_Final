@@ -9,6 +9,7 @@ interface ItineraryViewProps {
   onAddActivityClick: () => void;
   onAskLumi?: (prompt?: string) => void;
   onUpdateTimings?: (startTime: string, endTime: string) => void;
+  onShareClick?: () => void;
 }
 
 export const ItineraryView: React.FC<ItineraryViewProps> = ({
@@ -17,6 +18,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
   onAddActivityClick,
   onAskLumi,
   onUpdateTimings,
+  onShareClick,
 }) => {
   const [selectedDay, setSelectedDay] = useState(1);
   const [activeQuickFilter, setActiveQuickFilter] = useState<string | null>(null);
@@ -92,6 +94,18 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
               )}
             </p>
           </div>
+
+          {/* Share & Export Quick Button */}
+          {onShareClick && (
+            <button
+              onClick={onShareClick}
+              className="absolute top-4 left-4 bg-black/45 hover:bg-black/65 backdrop-blur-md rounded-xl px-3 py-2 border border-white/30 text-white flex items-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer text-xs font-bold"
+              title="Share or Export Itinerary"
+            >
+              <span className="material-symbols-outlined text-base text-amber-300">ios_share</span>
+              <span>Share & Export</span>
+            </button>
+          )}
 
           {/* Weather Widget */}
           <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-md rounded-xl p-3 border border-white/30 text-white flex items-center gap-2 shadow-md">
@@ -209,6 +223,17 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
 
         {/* Quick Filter Buttons */}
         <div className="flex gap-2 overflow-x-auto scrollbar-none py-1">
+          {onShareClick && (
+            <button
+              onClick={onShareClick}
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-full text-sm font-bold bg-gradient-to-r from-[#003875] to-[#0058bc] text-white shadow-md hover:opacity-95 active:scale-95 transition-all cursor-pointer flex-shrink-0"
+              title="Share Link or Export PDF"
+            >
+              <span className="material-symbols-outlined text-base">ios_share</span>
+              <span>Share & Export</span>
+            </button>
+          )}
+
           <button
             onClick={() => {
               setActiveQuickFilter(activeQuickFilter === 'navigate' ? null : 'navigate');

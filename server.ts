@@ -4,6 +4,7 @@ import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
 import { getAccuratePhotoUrl } from "./src/utils/photoResolver";
+import { synthesizeTripItinerary } from "./src/utils/tripSynthesizer";
 
 dotenv.config();
 
@@ -34,9 +35,9 @@ async function startServer() {
     },
   });
 
-  // Reusable function with exponential backoff & model fallbacks for high demand spikes
-  async function generateWithRetry(params: any, maxRetries = 2) {
-    const models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-pro"];
+  // Reusable function with active models, fast retry & graceful model fallbacks
+  async function generateWithRetry(params: any, maxRetries = 1) {
+    const models = ["gemini-3.6-flash", "gemini-3.8-flash", "gemini-2.5-flash"];
     let lastError: any = null;
 
     for (const modelName of models) {
@@ -62,8 +63,8 @@ async function startServer() {
           console.warn(`[Gemini API] ${modelName} attempt ${attempt + 1} failed: ${errMsg}`);
 
           if (isTransient && attempt < maxRetries) {
-            // Exponential backoff delay with jitter (1000ms, 2000ms)
-            await new Promise((resolve) => setTimeout(resolve, 1000 * Math.pow(2, attempt) + Math.random() * 300));
+            // Quick delay (400ms) before retrying same model
+            await new Promise((resolve) => setTimeout(resolve, 400));
             continue;
           }
           break; // Try next model in list
@@ -125,190 +126,130 @@ async function startServer() {
     }
   });
 
+  // JSON cleaner & parser
+  function cleanAndParseJson(raw: string) {
+    if (!raw) return null;
+    let text = raw.trim();
+    if (text.startsWith("```json")) {
+      text = text.slice(7);
+    } else if (text.startsWith("```")) {
+      text = text.slice(3);
+    }
+    if (text.endsWith("```")) {
+      text = text.slice(0, -3);
+    }
+    text = text.trim();
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      const firstBrace = text.indexOf("{");
+      const lastBrace = text.lastIndexOf("}");
+      if (firstBrace !== -1 && lastBrace > firstBrace) {
+        return JSON.parse(text.substring(firstBrace, lastBrace + 1));
+      }
+      throw e;
+    }
+  }
+
   // Real-time AI Trip Generation endpoint
   app.post("/api/generate-trip", async (req, res) => {
-    try {
-      const { from, destination, departure, days, budgetINR, travellers, tripStartTime, tripEndTime } = req.body;
-      const targetDest = destination || "Kyoto, Japan";
-      const daysCount = Math.min(Math.max(Number(days) || 3, 1), 10);
-      const departureDate = departure || "Next Month";
+    const { from, destination, departure, days, budgetINR, travellers, tripStartTime, tripEndTime } = req.body || {};
+    const targetDest = destination || "Kyoto, Japan";
+    const daysCount = Math.min(Math.max(Number(days) || 3, 1), 10);
+    const departureDate = departure || "Next Month";
 
-      if (!process.env.GEMINI_API_KEY) {
-        return res.json(createFallbackResponse(targetDest, departureDate, daysCount));
+    const getReliableFallback = () => {
+      try {
+        return synthesizeTripItinerary({
+          destination: targetDest,
+          from: from || "Current Location",
+          departure: departureDate,
+          days: daysCount,
+          budgetINR: budgetINR || "50,000",
+          travellers: travellers || "2 Travellers",
+          tripStartTime,
+          tripEndTime,
+        });
+      } catch (e) {
+        return createFallbackResponse(targetDest, departureDate, daysCount);
       }
+    };
 
+    if (!process.env.GEMINI_API_KEY) {
+      return res.json(getReliableFallback());
+    }
+
+    try {
       const prompt = `Craft a realistic, authentic ${daysCount}-day travel itinerary for ${targetDest} departing from ${from || "Indian Major City"} for ${travellers || "2 Travellers"} with a budget of ₹${budgetINR || "50,000"}.
 User Preferred Whole Trip Start Time: ${tripStartTime || "06:30 AM (Day 1 Departure)"}
 User Preferred Whole Trip End Time: ${tripEndTime || "09:45 PM (Day " + daysCount + " Return)"}
 
 Focus strictly from an Indian traveler's point of view with cost-sensitive optimization:
-0. tripStartTime: Set exact departure/start time of the whole trip based on user preference (e.g. "${tripStartTime || "06:30 AM (Day 1 Departure)"}") and tripEndTime: Set exact return/end time of the whole trip based on user preference (e.g. "${tripEndTime || "09:45 PM (Day " + daysCount + " Return)"}").
+0. tripStartTime: Set exact departure/start time of the whole trip (e.g. "${tripStartTime || "06:30 AM (Day 1 Departure)"}") and tripEndTime: Set exact return/end time (e.g. "${tripEndTime || "09:45 PM (Day " + daysCount + " Return)"}").
 1. Budget Breakdown summary in INR (₹): hotelsCost, foodCost, activitiesCost, transportCost, totalEstimatedCost.
-2. 2 Recommended Hotels/Stays (mix of value-for-money boutique hotel & budget homestay/Zostel) with name, rating, pricePerNight in INR, vibe, and imageUrl (Unsplash photo URL or '' if unavailable).
-3. 2 Top Restaurants / Dining Spots (highlighting local specialties and Pure Veg / Jain / Indian-friendly dining options) with name, cuisine, specialty, and priceRange in INR.
-4. Nearer Attractions (4 nearby spots to visit around the main destination).
+2. 2 Recommended Hotels/Stays with name, rating, pricePerNight in INR, vibe, and imageUrl.
+3. 2 Top Restaurants / Dining Spots (highlighting Pure Veg / Jain / regional dining options) with name, cuisine, specialty, and priceRange in INR.
+4. Nearer Attractions (4 nearby spots to visit).
 5. Day-by-day activities for Day 1 through Day ${daysCount} with Morning, Afternoon, Evening sections.
-Each activity should feature:
-- Exact timeline, including startTime (e.g. "09:00 AM") and endTime (e.g. "11:30 AM")
-- Cost badge in INR (e.g. Free, ₹200, ₹1,200)
-- Rich descriptive itinerary
-- imageUrl: Real photo URL of the place/landmark from Unsplash (e.g. https://images.unsplash.com/photo-...) or leave as empty string '' if a photo is not available.
-- Cost-saving Indian traveler local tip (e.g., using metro/bus pass, IRCTC train booking, early morning free hours, street food hacks)
-- nearbyPlaces list (3 nearby spots to walk to)
-- recommendedRestaurant with estimated cost in INR
-- transitInfo object with:
-  * recommendedMethod (e.g. BEST Bus #103 or Kaali-Peeli Taxi, Kyoto Bus #205, Metro Line 3)
-  * applicablePublicTransport (array of strings listing all public transport modes available at or near that place, e.g. ["BEST Bus #103 / #138", "Kaali-Peeli Taxi", "Local Train (CSMT Station)", "Metro Line 3"])
-  * routeGuidance (string describing point-to-point transport options to go to/from this place, e.g. "To go from Gateway of India to Marine Drive: Board BEST Bus #103 from Regal Cinema bus stop (~10 mins, ₹15) or take a Kaali-Peeli Taxi (~₹40, 7 mins).")`;
+Each activity must include:
+- id, title, time, duration, startTime, endTime
+- costBadgeText (e.g. "Free", "₹200", "₹1,200") and costBadgeClass ("bg-emerald-100 text-emerald-800")
+- description, localTip, openingHours, ticketPrice
+- nearbyPlaces (array of 3 strings)
+- recommendedRestaurant { name, cuisine, estimatedCost }
+- transitInfo { recommendedMethod, applicablePublicTransport: string[], routeGuidance }
+- tags: [{ icon: "camera", text: "Sightseeing", colorClass: "bg-blue-100 text-blue-800" }]
 
-      const response = await generateWithRetry({
+Return ONLY valid JSON matching this schema:
+{
+  "id": "trip-${Date.now()}",
+  "destination": "${targetDest}",
+  "dates": "${departureDate} • ${daysCount} Days",
+  "from": "${from || 'Current Location'}",
+  "travellers": "${travellers || '2 Travellers'}",
+  "tripStartTime": "${tripStartTime || '06:30 AM (Day 1 Departure)'}",
+  "tripEndTime": "${tripEndTime || '09:45 PM (Day ' + daysCount + ' Return)'}",
+  "status": "Ongoing",
+  "weather": { "temp": "25°C", "condition": "Sunny & Pleasant" },
+  "budgetSummary": { "hotelsCost": "...", "foodCost": "...", "activitiesCost": "...", "transportCost": "...", "totalEstimatedCost": "..." },
+  "hotels": [{ "name": "...", "rating": "4.7 ★", "pricePerNight": "₹...", "vibe": "...", "imageUrl": "" }],
+  "restaurants": [{ "name": "...", "cuisine": "...", "specialty": "...", "priceRange": "₹..." }],
+  "nearbyAttractions": ["...", "...", "...", "..."],
+  "dayItineraries": [
+    {
+      "dayNumber": 1,
+      "sections": [
+        { "period": "Morning", "activities": [...] },
+        { "period": "Afternoon", "activities": [...] },
+        { "period": "Evening", "activities": [...] }
+      ]
+    }
+  ]
+}`;
+
+      // 14-second race against timeout
+      const aiPromise = generateWithRetry({
         contents: prompt,
         config: {
           responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              id: { type: Type.STRING },
-              destination: { type: Type.STRING },
-              dates: { type: Type.STRING },
-              tripStartTime: { type: Type.STRING },
-              tripEndTime: { type: Type.STRING },
-              travellers: { type: Type.STRING },
-              status: { type: Type.STRING },
-              imageUrl: { type: Type.STRING },
-              weather: {
-                type: Type.OBJECT,
-                properties: {
-                  temp: { type: Type.STRING },
-                  condition: { type: Type.STRING }
-                },
-                required: ["temp", "condition"]
-              },
-              budgetSummary: {
-                type: Type.OBJECT,
-                properties: {
-                  hotelsCost: { type: Type.STRING },
-                  foodCost: { type: Type.STRING },
-                  activitiesCost: { type: Type.STRING },
-                  transportCost: { type: Type.STRING },
-                  totalEstimatedCost: { type: Type.STRING }
-                }
-              },
-              hotels: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    name: { type: Type.STRING },
-                    rating: { type: Type.STRING },
-                    pricePerNight: { type: Type.STRING },
-                    vibe: { type: Type.STRING },
-                    imageUrl: { type: Type.STRING }
-                  }
-                }
-              },
-              restaurants: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    name: { type: Type.STRING },
-                    cuisine: { type: Type.STRING },
-                    specialty: { type: Type.STRING },
-                    priceRange: { type: Type.STRING }
-                  }
-                }
-              },
-              nearbyAttractions: {
-                type: Type.ARRAY,
-                items: { type: Type.STRING }
-              },
-              dayItineraries: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    dayNumber: { type: Type.NUMBER },
-                    sections: {
-                      type: Type.ARRAY,
-                      items: {
-                        type: Type.OBJECT,
-                        properties: {
-                          period: { type: Type.STRING },
-                          activities: {
-                            type: Type.ARRAY,
-                            items: {
-                              type: Type.OBJECT,
-                              properties: {
-                                id: { type: Type.STRING },
-                                title: { type: Type.STRING },
-                                time: { type: Type.STRING },
-                                duration: { type: Type.STRING },
-                                startTime: { type: Type.STRING },
-                                endTime: { type: Type.STRING },
-                                costBadgeText: { type: Type.STRING },
-                                costBadgeClass: { type: Type.STRING },
-                                description: { type: Type.STRING },
-                                imageUrl: { type: Type.STRING },
-                                tags: {
-                                  type: Type.ARRAY,
-                                  items: {
-                                    type: Type.OBJECT,
-                                    properties: {
-                                      icon: { type: Type.STRING },
-                                      text: { type: Type.STRING },
-                                      colorClass: { type: Type.STRING }
-                                    },
-                                    required: ["icon", "text", "colorClass"]
-                                  }
-                                },
-                                localTip: { type: Type.STRING },
-                                openingHours: { type: Type.STRING },
-                                ticketPrice: { type: Type.STRING },
-                                nearbyPlaces: {
-                                  type: Type.ARRAY,
-                                  items: { type: Type.STRING }
-                                },
-                                recommendedRestaurant: {
-                                  type: Type.OBJECT,
-                                  properties: {
-                                    name: { type: Type.STRING },
-                                    cuisine: { type: Type.STRING },
-                                    estimatedCost: { type: Type.STRING }
-                                  }
-                                },
-                                transitInfo: {
-                                  type: Type.OBJECT,
-                                  properties: {
-                                    recommendedMethod: { type: Type.STRING },
-                                    applicablePublicTransport: {
-                                      type: Type.ARRAY,
-                                      items: { type: Type.STRING }
-                                    },
-                                    routeGuidance: { type: Type.STRING }
-                                  }
-                                }
-                              },
-                              required: ["id", "title", "time", "duration", "costBadgeText", "costBadgeClass", "description", "tags"]
-                            }
-                          }
-                        },
-                        required: ["period", "activities"]
-                      }
-                    }
-                  },
-                  required: ["dayNumber", "sections"]
-                }
-              }
-            },
-            required: ["destination", "dates", "dayItineraries"]
-          },
-          systemInstruction: "You are an expert AI travel curator tailored specifically for Indian travelers and cost-sensitive budget planning for AI Travel Planner. Return structured, highly accurate travel itineraries with realistic activities, budget summaries in INR, hotels/homestays, pure-veg/local dining options, and practical money-saving local tips."
-        }
+          systemInstruction: "You are an expert AI travel curator tailored specifically for Indian travelers and cost-sensitive budget planning. Return only valid, rich JSON with exactly " + daysCount + " days in dayItineraries.",
+        },
       });
 
-      const parsed = JSON.parse(response.text || "{}");
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("AI generation timeout exceeded 14s")), 14000)
+      );
+
+      const response: any = await Promise.race([aiPromise, timeoutPromise]);
+      const rawText = response?.text || "";
+      const parsed = cleanAndParseJson(rawText);
+
+      if (!parsed || !Array.isArray(parsed.dayItineraries) || parsed.dayItineraries.length === 0) {
+        throw new Error("Parsed response missing dayItineraries");
+      }
+
       const destName = parsed.destination || targetDest;
+      parsed.destination = destName;
       
       // Ensure accurate photo for destination
       if (!parsed.imageUrl || parsed.imageUrl.includes('placeholder') || parsed.imageUrl === 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&q=80') {
@@ -344,14 +285,8 @@ Each activity should feature:
       }
       return res.json(parsed);
     } catch (err: any) {
-      console.error("Failed to generate AI trip itinerary:", err);
-      return res.json(
-        createFallbackResponse(
-          req.body?.destination || "Kyoto, Japan",
-          req.body?.departure,
-          Number(req.body?.days) || 3
-        )
-      );
+      console.warn("[Server] Real-time AI generation fallback triggered:", err?.message || err);
+      return res.json(getReliableFallback());
     }
   });
 

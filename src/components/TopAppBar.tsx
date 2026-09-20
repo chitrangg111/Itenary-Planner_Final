@@ -8,6 +8,8 @@ interface TopAppBarProps {
   onOpenProfile?: () => void;
   showSearch?: boolean;
   onSearchClick?: () => void;
+  showShare?: boolean;
+  onShareClick?: () => void;
   canGoBack?: boolean;
   onBack?: () => void;
   isPhoneFrame?: boolean;
@@ -20,6 +22,8 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
   onOpenProfile,
   showSearch,
   onSearchClick,
+  showShare,
+  onShareClick,
   canGoBack,
   onBack,
   isPhoneFrame,
@@ -73,6 +77,17 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
             >
               <span className="material-symbols-outlined text-base">smartphone</span>
               <span className="hidden md:inline">{isPhoneFrame ? 'Phone View' : 'Full Screen'}</span>
+            </button>
+          )}
+
+          {showShare && onShareClick && (
+            <button
+              onClick={onShareClick}
+              className="p-1.5 rounded-full hover:bg-black/5 active:scale-95 transition-all text-[#0058bc] cursor-pointer flex items-center justify-center"
+              aria-label="Share Itinerary"
+              title="Share & Export Itinerary"
+            >
+              <span className="material-symbols-outlined text-xl">share</span>
             </button>
           )}
 
